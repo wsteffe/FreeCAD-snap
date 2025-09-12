@@ -1,4 +1,4 @@
-name: freecad
+name: freecad-unipartcs
 base: core22
 adopt-info: freecad
 donation: https://wiki.freecad.org/Donate
@@ -85,7 +85,7 @@ apps:
     command: usr/bin/FreeCAD
     extensions: [kde-neon]
     common-id: org.freecad.FreeCAD.desktop
-    desktop: usr/share/applications/org.freecad.FreeCAD.desktop
+    desktop: usr/share/applications/freecad-unipartcs.desktop
     plugs: &plugs
       - home
       - opengl
@@ -137,7 +137,8 @@ parts:
 
   freecad:
     plugin: cmake
-    source: https://github.com/FreeCAD/FreeCAD.git
+    source: https://github.com/wsteffe/FreeCAD.git
+    source-branch: SimplerBody
     cmake-parameters:
       - -DCMAKE_INSTALL_PREFIX=/usr
       - -DCMAKE_INSTALL_LIBDIR=lib
@@ -245,9 +246,17 @@ parts:
         ln -s /usr/bin/shiboken2 $SHIBOKEN_BIN_PATH
       fi
       craftctl default
+      desktop_in="$CRAFT_PART_INSTALL/usr/share/applications/org.freecad.FreeCAD.desktop"
+      # Keep/patch icon path (already present in your file)
       sed -i -E \
         "s|^Icon=(.*)|Icon=\${SNAP}/usr/share/icons/hicolor/scalable/apps/org.freecad.FreeCAD.svg|g" \
-        $CRAFT_PART_INSTALL/usr/share/applications/org.freecad.FreeCAD.desktop
+        "$desktop_in"
+      # ★ Make the menu entry clearly UNOFFICIAL
+      sed -i -E 's|^Name=.*|Name=FreeCAD (Unified Part CS — Unofficial)|' "$desktop_in"
+      sed -i -E 's|^Comment=.*|Comment=Experimental UNOFFICIAL build from PR #23610|' "$desktop_in"
+      # ★ Give it a unique desktop *file name* (desktop-id) to avoid clashing with official FreeCAD
+      install -D -m 0644 "$desktop_in" \
+        "$CRAFT_PART_INSTALL/usr/share/applications/freecad-unipartcs.desktop"
       if [ "$CRAFT_ARCH_BUILD_FOR" = amd64 ]; then
         ln -sf ../libpsm1/libpsm_infinipath.so.1.16  $CRAFT_PART_INSTALL/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libpsm_infinipath.so.1
       fi
@@ -257,6 +266,7 @@ parts:
       git_hash=$(git rev-parse --short=8 HEAD)
       version="${version_major}.${version_minor}-g$git_hash"
       craftctl set version="$version"
+
 
   python-packages:
     plugin: python
