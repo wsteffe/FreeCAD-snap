@@ -1,6 +1,9 @@
 name: freecad-unipartcs
 base: core22
 adopt-info: freecad
+architectures:
+  - build-on: [amd64]
+    build-for: [amd64]
 donation: https://wiki.freecad.org/Donate
 issues: https://github.com/FreeCAD/FreeCAD-snap/issues
 website: https://freecad.org
