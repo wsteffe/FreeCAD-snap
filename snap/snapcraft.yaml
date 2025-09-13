@@ -81,7 +81,7 @@ environment:
   POVINI: $SNAP/etc/povray/3.7/povray.ini # Raytracing
 
 apps:
-  freecad:
+  freecad-unipartcs:
     command: usr/bin/FreeCAD
     extensions: [kde-neon]
     common-id: org.freecad.FreeCAD.desktop
